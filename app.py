@@ -2,6 +2,7 @@ import os
 from flask import Flask
 import requests
 import cv2
+import w3storage
 
 path = (os.getcwd())
 path = os.path.join(path, 'static')
@@ -68,12 +69,33 @@ def generate_video():
     return "video generated"
 
 
+def up(filename):
+    w3 = w3storage.API(token='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweGNDMGJCMWI4Yzc5MkVDMjYzODE5NjNGOWYwNGJlRWFBZmExMTY3NmYiLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE2NjQ0MzA5ODQzNzMsIm5hbWUiOiJweWFwaSJ9.QHfc2DXkoXwai9qGXFXxsh2QZXm64QP4ie1Uyrk4tlg')
+
+    some_uploads = w3.user_uploads(size=25)
+
+    # limited to 100 MB
+    
+    media_cid = w3.post_upload((filename, open(os.path.join(path,filename), 'rb')))
+    print(media_cid)
+    return media_cid
+
+    # larger files can be uploaded by splitting them into .cars.
+
+
+
 @app.route('/img')
 def aim():
     image_url = "https://bafybeiefgd4fur5pjpbrcdlbncjvbyjvd7okph2mpz66bdkaj25zuz4xru.ipfs.w3s.link/3d_1515.jpg"
 
     down(image_url, "photo")
     return "Image Downloaded"
+
+@app.route('/up')
+def upl():
+    cid= up("video.avi")
+
+    return "video uploaded successfully \n cid = " + str(cid)
 
 @app.route('/image')
 def photos():
