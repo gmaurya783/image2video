@@ -3,17 +3,96 @@ from flask import Flask
 import requests
 import cv2
 import w3storage
+from PIL import Image
 
 path = (os.getcwd())
 path = os.path.join(path, 'static')
-print(path)
+#print(path)
 
 app = Flask(__name__)
 
 @app.route('/')
 def hello():
-    print("Hello Gaurav")
     return "Hello World"
+
+@app.route('/copy')
+def img():
+    os.chdir(path)
+    mean_height = 0
+    mean_width = 0
+
+    images = [img for img in os.listdir('.')
+    if img.endswith(".jpg") or
+        img.endswith(".jpeg") or
+        img.endswith("png")]
+
+    num_of_images = len(images)
+    print(num_of_images)
+
+    for file in os.listdir('.'):
+        if file.endswith(".jpg") or file.endswith(".jpeg") or file.endswith("png"):
+            im = Image.open(os.path.join(path, file))
+            width, height = im.size
+            mean_width += width
+            mean_height += height
+            # im.show() # uncomment this for displaying the image
+
+    # Finding the mean height and width of all images.
+    # This is required because the video frame needs
+    # to be set with same width and height. Otherwise
+    # images not equal to that width height will not get
+    # embedded into the video
+    mean_width = int(mean_width / num_of_images)
+    mean_height = int(mean_height / num_of_images)
+
+    # print(mean_height)
+    # print(mean_width)
+
+    # Resizing of the images to give
+    # them same width and height
+    for file in os.listdir('.'):
+        if file.endswith(".jpg") or file.endswith(".jpeg") or file.endswith("png"):
+            # opening image using PIL Image
+            im = Image.open(os.path.join(path, file))
+
+            # im.size includes the height and width of image
+            width, height = im.size
+            #print(width, height)
+
+            # resizing
+            imResize = im.resize((mean_width, mean_height), Image.ANTIALIAS)
+            imResize.save( file, 'JPEG', quality = 95) # setting quality
+            # printing each resized image name
+            #print(im.filename.split('\\')[-1], " is resized")
+
+    # Copying the image multiple time to
+    # set video timestamp = 20 sec
+    # Limitation max image = 10
+    Required_num_of_images = 20
+    if(Required_num_of_images > num_of_images):
+        copy_num =int((Required_num_of_images - num_of_images)/ num_of_images)
+        rem_num = Required_num_of_images % num_of_images 
+        if(copy_num):
+            for file in os.listdir('.'):
+                if file.endswith(".jpg") or file.endswith(".jpeg") or file.endswith("png"):
+                    # opening image using PIL Image
+                    im = Image.open(os.path.join(path, file))
+
+                    for x in range(copy_num):
+                        temp = file.split('.')
+                        temp[0]= temp[0]+'_'+ str(x)
+                        filename = temp[0]+'.'+temp[1]
+                        im.save(filename, 'JPEG', quality= 95)
+                        #print(filename)
+                        if (x == copy_num -1):
+                            if(rem_num):
+                                temp = file.split('.')
+                                temp[0]= temp[0]+'_'+ str(copy_num)
+                                filename = temp[0]+'.'+temp[1]
+                                im.save(filename, 'JPEG', quality= 95)
+                                #print(filename)
+                                rem_num = rem_num -1  
+    return "Multiple images generated"
 
 def down(img_url, filename):
     #image_url = "https://bafybeiefgd4fur5pjpbrcdlbncjvbyjvd7okph2mpz66bdkaj25zuz4xru.ipfs.w3s.link/3d_1515.jpg"
