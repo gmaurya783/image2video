@@ -4,6 +4,7 @@ import requests
 import cv2
 
 path = (os.getcwd())
+path = os.path.join(path, 'static')
 print(path)
 
 app = Flask(__name__)
@@ -15,14 +16,15 @@ def hello():
 
 def down(img_url, filename):
     #image_url = "https://bafybeiefgd4fur5pjpbrcdlbncjvbyjvd7okph2mpz66bdkaj25zuz4xru.ipfs.w3s.link/3d_1515.jpg"
-    save_path = "static\\"
+    filename = filename + '.jpg'
+    save_path = os.path.join(path, filename)
   
     # URL of the image to be downloaded is defined as img_url
     r = requests.get(img_url) # create HTTP response object
     
     # send a HTTP request to the server and save
     # the HTTP response in a response object called r
-    with open(filename+'.jpg','wb') as f:
+    with open(save_path,'wb') as f:
     
         # Saving received content as a jpg file in
         # binary format
