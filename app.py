@@ -61,7 +61,7 @@ def generate_video():
         video.write(cv2.imread(os.path.join(image_folder, image)))
     
     # Deallocating memories taken for window creation
-    cv2.destroyAllWindows()
+    #cv2.destroyAllWindows()
     video.release() # releasing the video generated
     return "video generated"
 
