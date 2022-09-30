@@ -1,6 +1,9 @@
-
+import os
 from flask import Flask
 import requests
+
+path = (os.getcwd())
+#print(path)
 
 app = Flask(__name__)
 
@@ -34,6 +37,20 @@ def aim():
 
     down(image_url, "photo")
     return "Image Downloaded"
+
+@app.route('/image')
+def photos():
+    os.chdir(path)
+    images = [img for img in os.listdir('.')
+    if img.endswith(".jpg") or
+        img.endswith(".jpeg") or
+        img.endswith("png")]
+        
+        # Array images should only consider
+        # the image files ignoring others if any
+    #print(images)
+    #im = Image.open(os.path.join(path, images[0]))
+    return "image list - " + str(images) 
 
 
 if __name__=="__main__":
