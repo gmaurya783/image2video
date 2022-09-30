@@ -1,9 +1,10 @@
 import os
 from flask import Flask
 import requests
+import cv2
 
 path = (os.getcwd())
-#print(path)
+print(path)
 
 app = Flask(__name__)
 
@@ -31,6 +32,40 @@ def down(img_url, filename):
         f.write(r.content)
 
 
+# Video Generating function
+@app.route('/vdo')
+def generate_video():
+    image_folder = '.' # make sure to use your folder
+    video_name = 'video.avi'
+    os.chdir(path)
+    
+    images = [img for img in os.listdir(image_folder)
+            if img.endswith(".jpg") or
+                img.endswith(".jpeg") or
+                img.endswith("png")]
+    
+    # Array images should only consider
+    # the image files ignoring others if any
+    print(images)
+
+    frame = cv2.imread(os.path.join(image_folder, images[0]))
+
+    # setting the frame width, height width
+    # the width, height of first image
+    height, width, layers = frame.shape
+
+    video = cv2.VideoWriter(video_name, 0, 1, (width, height))
+
+    # Appending the images to the video one by one
+    for image in images:
+        video.write(cv2.imread(os.path.join(image_folder, image)))
+    
+    # Deallocating memories taken for window creation
+    cv2.destroyAllWindows()
+    video.release() # releasing the video generated
+    return "video generated"
+
+
 @app.route('/img')
 def aim():
     image_url = "https://bafybeiefgd4fur5pjpbrcdlbncjvbyjvd7okph2mpz66bdkaj25zuz4xru.ipfs.w3s.link/3d_1515.jpg"
@@ -44,7 +79,8 @@ def photos():
     images = [img for img in os.listdir('.')
     if img.endswith(".jpg") or
         img.endswith(".jpeg") or
-        img.endswith("png")]
+        img.endswith("png") or
+        img.endswith(".avi")]
         
         # Array images should only consider
         # the image files ignoring others if any
