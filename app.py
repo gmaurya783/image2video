@@ -1,6 +1,6 @@
 from fileinput import filename
 import os
-from flask import Flask, request
+from flask import Flask, request, jsonify
 import requests
 import cv2
 import w3storage
@@ -199,9 +199,15 @@ def api(images):
     print("Video Generated")
     cid= up("video.avi")
     print("Video Uploaded")
+    data = {
+            "cid" : cid,
+            "Video_link" : "https://"+cid+".ipfs.w3s.link/"
+        }
+
     del_media()
 
-    return cid
+
+    return data
 
 
 @app.route('/up')
@@ -219,8 +225,8 @@ def aim():
         #images_link = request.form.get('images')
     else:
         images_link = request.args.get('images')
-    cid = api(images_link)
-    return "Video Created and uploaded Successfully on database & Here is the CID -> " + str(cid)
+    data = api(images_link)
+    return jsonify(data)
 
 
 @app.route('/media')
