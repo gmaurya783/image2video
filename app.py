@@ -187,6 +187,10 @@ def del_media():
             print("File % s can not be removed" % file_path)
 
 def api(images):
+    try: 
+        os.mkdir(path) 
+    except OSError as error: 
+        print(error) 
     #images = list(images)
     download_images(images)
     img()
