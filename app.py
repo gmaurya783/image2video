@@ -224,8 +224,10 @@ def aim():
     if request.method == 'POST':
         request_data = request.get_json()
         print(request_data)
-        images_link = request_data['images']
+        print(type(request_data))
+        images_link = request_data
         #images_link = request.form.get('images')
+
     else:
         images_link = request.args.get('images')
     data = api(images_link)
