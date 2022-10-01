@@ -172,7 +172,6 @@ def download_images(images):
 def api(images):
     #images = list(images)
     download_images(images)
-    print ("Image Downloaded")
     img()
     print("Image Processed")
     generate_video()
