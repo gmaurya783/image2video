@@ -1,6 +1,7 @@
 from fileinput import filename
 import os
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import requests
 import cv2
 import w3storage
@@ -11,6 +12,7 @@ path = os.path.join(path, 'static')
 #print(path)
 
 app = Flask(__name__)
+cors = CORS(app, resources={r"/i2v/*": {"origins": "*"}})
 
 @app.route('/')
 def hello():
