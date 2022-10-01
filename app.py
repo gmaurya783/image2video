@@ -223,6 +223,7 @@ def aim():
     # handle the POST request
     if request.method == 'POST':
         request_data = request.get_json()
+        print(request_data)
         images_link = request_data['images']
         #images_link = request.form.get('images')
     else:
