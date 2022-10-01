@@ -169,6 +169,23 @@ def download_images(images):
         count += 1
     print("images Downloaded")
 
+def del_media():
+    os.chdir(path)
+    media = [img for img in os.listdir('.')
+    if img.endswith(".jpg") or
+        img.endswith(".jpeg") or
+        img.endswith("png") ]
+    
+    for med in media:
+        file_path = os.path.join(path, med)
+        # Remove the file
+        try:
+            os.remove(file_path)
+            print("% s removed successfully" % file_path)
+        except OSError as error:
+            print(error)
+            print("File % s can not be removed" % file_path)
+
 def api(images):
     #images = list(images)
     download_images(images)
@@ -178,6 +195,7 @@ def api(images):
     print("Video Generated")
     cid= up("video.avi")
     print("Video Uploaded")
+    del_media()
 
     return cid
 
