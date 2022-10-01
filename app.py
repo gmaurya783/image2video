@@ -1,5 +1,6 @@
+from fileinput import filename
 import os
-from flask import Flask
+from flask import Flask, request
 import requests
 import cv2
 import w3storage
@@ -15,7 +16,7 @@ app = Flask(__name__)
 def hello():
     return "Hello World"
 
-@app.route('/copy')
+
 def img():
     os.chdir(path)
     mean_height = 0
@@ -92,7 +93,7 @@ def img():
                                 im.save(filename, 'JPEG', quality= 95)
                                 #print(filename)
                                 rem_num = rem_num -1  
-    return "Multiple images generated"
+
 
 def down(img_url, filename):
     #image_url = "https://bafybeiefgd4fur5pjpbrcdlbncjvbyjvd7okph2mpz66bdkaj25zuz4xru.ipfs.w3s.link/3d_1515.jpg"
@@ -115,7 +116,6 @@ def down(img_url, filename):
 
 
 # Video Generating function
-@app.route('/vdo')
 def generate_video():
     image_folder = '.' # make sure to use your folder
     video_name = 'video.avi'
@@ -145,7 +145,7 @@ def generate_video():
     # Deallocating memories taken for window creation
     #cv2.destroyAllWindows()
     video.release() # releasing the video generated
-    return "video generated"
+    
 
 
 def up(filename):
@@ -160,23 +160,49 @@ def up(filename):
     return media_cid
 
     # larger files can be uploaded by splitting them into .cars.
+def download_images(images):
+    count= 0
+    for img_link in images:
+        filename = 'image_'+str(count)+"_photo"
+        down(img_link, filename)
+        print(filename)
+        count += 1
+    print("images Downloaded")
 
+def api(images):
+    #images = list(images)
+    download_images(images)
+    print ("Image Downloaded")
+    img()
+    print("Image Processed")
+    generate_video()
+    print("Video Generated")
+    cid= up("video.avi")
+    print("Video Uploaded")
 
+    return cid
 
-@app.route('/img')
-def aim():
-    image_url = "https://bafybeiefgd4fur5pjpbrcdlbncjvbyjvd7okph2mpz66bdkaj25zuz4xru.ipfs.w3s.link/3d_1515.jpg"
-
-    down(image_url, "photo")
-    return "Image Downloaded"
 
 @app.route('/up')
-def upl():
+def upload():
     cid= up("video.avi")
+    print("Video Uploaded")
+    return "Video Created and uploaded Successfully on database & Here is the CID -> " + str(cid)
 
-    return "video uploaded successfully \n cid = " + str(cid)
+@app.route('/i2v', methods=['GET', 'POST'])
+def aim():
+    # handle the POST request
+    if request.method == 'POST':
+        request_data = request.get_json()
+        images_link = request_data['images']
+        #images_link = request.form.get('images')
+    else:
+        images_link = request.args.get('images')
+    cid = api(images_link)
+    return "Video Created and uploaded Successfully on database & Here is the CID -> " + str(cid)
 
-@app.route('/image')
+
+@app.route('/media')
 def photos():
     os.chdir(path)
     images = [img for img in os.listdir('.')
