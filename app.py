@@ -256,7 +256,7 @@ def photos():
         # Array images should only consider
         # the image files ignoring others if any
     #print(images)
-    generate_video()
+    # generate_video()
     #im = Image.open(os.path.join(path, images[0]))
     return "image list - " + str(images) 
 
