@@ -232,7 +232,10 @@ def aim():
         request_data = request.get_json()
         print(request_data)
         print(type(request_data))
-        images_link = request_data
+        if (type(request_data) is dict):
+            images_link = request_data['images']
+        else:
+            images_link = request_data
         #images_link = request.form.get('images')
 
     else:
