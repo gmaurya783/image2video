@@ -30,7 +30,7 @@ def img():
         img.endswith("png")]
 
     num_of_images = len(images)
-    print(num_of_images)
+    #print(num_of_images)
 
     for file in os.listdir('.'):
         if file.endswith(".jpg") or file.endswith(".jpeg") or file.endswith("png"):
@@ -71,30 +71,30 @@ def img():
     # Copying the image multiple time to
     # set video timestamp = 20 sec
     # Limitation max image = 10
-    Required_num_of_images = 20
-    if(Required_num_of_images > num_of_images):
-        copy_num =int((Required_num_of_images - num_of_images)/ num_of_images)
-        rem_num = Required_num_of_images % num_of_images 
-        if(copy_num):
-            for file in os.listdir('.'):
-                if file.endswith(".jpg") or file.endswith(".jpeg") or file.endswith("png"):
-                    # opening image using PIL Image
-                    im = Image.open(os.path.join(path, file))
+    # Required_num_of_images = 20
+    # if(Required_num_of_images > num_of_images):
+    #     copy_num =int((Required_num_of_images - num_of_images)/ num_of_images)
+    #     rem_num = Required_num_of_images % num_of_images 
+    #     if(copy_num):
+    #         for file in os.listdir('.'):
+    #             if file.endswith(".jpg") or file.endswith(".jpeg") or file.endswith("png"):
+    #                 # opening image using PIL Image
+    #                 im = Image.open(os.path.join(path, file))
 
-                    for x in range(copy_num):
-                        temp = file.split('.')
-                        temp[0]= temp[0]+'_'+ str(x)
-                        filename = temp[0]+'.'+temp[1]
-                        im.save(filename, 'JPEG', quality= 95)
-                        #print(filename)
-                        if (x == copy_num -1):
-                            if(rem_num):
-                                temp = file.split('.')
-                                temp[0]= temp[0]+'_'+ str(copy_num)
-                                filename = temp[0]+'.'+temp[1]
-                                im.save(filename, 'JPEG', quality= 95)
-                                #print(filename)
-                                rem_num = rem_num -1  
+    #                 for x in range(copy_num):
+    #                     temp = file.split('.')
+    #                     temp[0]= temp[0]+'_'+ str(x)
+    #                     filename = temp[0]+'.'+temp[1]
+    #                     im.save(filename, 'JPEG', quality= 95)
+    #                     #print(filename)
+    #                     if (x == copy_num -1):
+    #                         if(rem_num):
+    #                             temp = file.split('.')
+    #                             temp[0]= temp[0]+'_'+ str(copy_num)
+    #                             filename = temp[0]+'.'+temp[1]
+    #                             im.save(filename, 'JPEG', quality= 95)
+    #                             #print(filename)
+    #                             rem_num = rem_num -1  
 
 
 def down(img_url, filename):
@@ -127,20 +127,26 @@ def generate_video():
             if img.endswith(".jpg") or
                 img.endswith(".jpeg") or
                 img.endswith("png")]
-    
     # Array images should only consider
     # the image files ignoring others if any
+    num_of_images = len(images)
+    print(num_of_images)
+    Required_video_timeperiod = 20
+    fps = num_of_images/Required_video_timeperiod
+
+    # Sorting images by name
+    images.sort()
     print(images)
 
     frame = cv2.imread(os.path.join(image_folder, images[0]))
 
-    # setting the frame width, height width
+    # setting the frame width, height width 
     # the width, height of first image
     height, width, layers = frame.shape
 
-    video = cv2.VideoWriter(video_name, 0, 1, (width, height))
+    video = cv2.VideoWriter(video_name, 0, fps, (width, height))
 
-    # Appending the images to the video one by one
+    # Appending the images to the video one by one # cv2.VideoWriter_fourcc(*'MP4V')
     for image in images:
         video.write(cv2.imread(os.path.join(image_folder, image)))
     
@@ -207,6 +213,7 @@ def api(images):
         }
 
     del_media()
+    print(data)
 
 
     return data
@@ -246,6 +253,7 @@ def photos():
         # Array images should only consider
         # the image files ignoring others if any
     #print(images)
+    generate_video()
     #im = Image.open(os.path.join(path, images[0]))
     return "image list - " + str(images) 
 
