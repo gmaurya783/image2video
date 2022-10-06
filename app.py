@@ -1,4 +1,3 @@
-from fileinput import filename
 import os
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -71,30 +70,30 @@ def img():
     # Copying the image multiple time to
     # set video timestamp = 20 sec
     # Limitation max image = 10
-    # Required_num_of_images = 20
-    # if(Required_num_of_images > num_of_images):
-    #     copy_num =int((Required_num_of_images - num_of_images)/ num_of_images)
-    #     rem_num = Required_num_of_images % num_of_images 
-    #     if(copy_num):
-    #         for file in os.listdir('.'):
-    #             if file.endswith(".jpg") or file.endswith(".jpeg") or file.endswith("png"):
-    #                 # opening image using PIL Image
-    #                 im = Image.open(os.path.join(path, file))
+    Required_num_of_images = 20
+    if(Required_num_of_images > num_of_images):
+        copy_num =int((Required_num_of_images - num_of_images)/ num_of_images)
+        rem_num = Required_num_of_images % num_of_images 
+        if(copy_num):
+            for file in os.listdir('.'):
+                if file.endswith(".jpg") or file.endswith(".jpeg") or file.endswith("png"):
+                    # opening image using PIL Image
+                    im = Image.open(os.path.join(path, file))
 
-    #                 for x in range(copy_num):
-    #                     temp = file.split('.')
-    #                     temp[0]= temp[0]+'_'+ str(x)
-    #                     filename = temp[0]+'.'+temp[1]
-    #                     im.save(filename, 'JPEG', quality= 95)
-    #                     #print(filename)
-    #                     if (x == copy_num -1):
-    #                         if(rem_num):
-    #                             temp = file.split('.')
-    #                             temp[0]= temp[0]+'_'+ str(copy_num)
-    #                             filename = temp[0]+'.'+temp[1]
-    #                             im.save(filename, 'JPEG', quality= 95)
-    #                             #print(filename)
-    #                             rem_num = rem_num -1  
+                    for x in range(copy_num):
+                        temp = file.split('.')
+                        temp[0]= temp[0]+'_'+ str(x)
+                        filename = temp[0]+'.'+temp[1]
+                        im.save(filename, 'JPEG', quality= 95)
+                        #print(filename)
+                        if (x == copy_num -1):
+                            if(rem_num):
+                                temp = file.split('.')
+                                temp[0]= temp[0]+'_'+ str(copy_num)
+                                filename = temp[0]+'.'+temp[1]
+                                im.save(filename, 'JPEG', quality= 95)
+                                #print(filename)
+                                rem_num = rem_num -1  
 
 
 def down(img_url, filename):
@@ -144,7 +143,7 @@ def generate_video():
     # the width, height of first image
     height, width, layers = frame.shape
 
-    video = cv2.VideoWriter(video_name, 0, fps, (width, height))
+    video = cv2.VideoWriter(video_name, 0, 1, (width, height))
 
     # Appending the images to the video one by one # cv2.VideoWriter_fourcc(*'MP4V')
     for image in images:
@@ -154,7 +153,9 @@ def generate_video():
     #cv2.destroyAllWindows()
     video.release() # releasing the video generated
     
-
+def convert_avi_2_mp4():
+    os.system("ffmpeg -v quiet -i video.avi video.mp4 -y")
+    print ("FFMPEG conversion done")
 
 def up(filename):
     w3 = w3storage.API(token='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweGNDMGJCMWI4Yzc5MkVDMjYzODE5NjNGOWYwNGJlRWFBZmExMTY3NmYiLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE2NjQ0MzA5ODQzNzMsIm5hbWUiOiJweWFwaSJ9.QHfc2DXkoXwai9qGXFXxsh2QZXm64QP4ie1Uyrk4tlg')
@@ -182,7 +183,8 @@ def del_media():
     media = [img for img in os.listdir('.')
     if img.endswith(".jpg") or
         img.endswith(".jpeg") or
-        img.endswith("png") ]
+        img.endswith(".png") or
+        img.endswith(".avi")]
     
     for med in media:
         file_path = os.path.join(path, med)
@@ -205,14 +207,16 @@ def api(images):
     print("Image Processed")
     generate_video()
     print("Video Generated")
-    cid= up("video.avi")
+    convert_avi_2_mp4()
+    cid= up("video.mp4")
     print("Video Uploaded")
     data = {
             "cid" : cid,
-            "Video_link" : "https://"+cid+".ipfs.w3s.link/"
+            "Video_link" : "https://"+cid+".ipfs.w3s.link/",
+            "Video_Link_1" : "https://ipfs.io/ipfs/"+cid
         }
 
-    del_media()
+    # del_media()
     print(data)
 
 
