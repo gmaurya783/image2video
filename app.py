@@ -153,8 +153,10 @@ def generate_video():
     #cv2.destroyAllWindows()
     video.release() # releasing the video generated
     
-def convert_avi_2_mp4():
-    os.system("ffmpeg -v quiet -i video.avi video.mp4 -y")
+def convert_avi_2_mp4(video):
+    file_path = os.path.join(path, video)
+    vid_path = os.path.join(path, 'video.mp4')
+    os.system("ffmpeg -v quiet -i "+file_path+" "+vid_path+" -y")
     print ("FFMPEG conversion done")
 
 def up(filename):
@@ -207,7 +209,7 @@ def api(images):
     print("Image Processed")
     generate_video()
     print("Video Generated")
-    convert_avi_2_mp4()
+    convert_avi_2_mp4("video.avi")
     cid= up("video.mp4")
     print("Video Uploaded")
     data = {
