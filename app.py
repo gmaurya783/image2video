@@ -216,7 +216,7 @@ def api(images):
             "Video_Link_1" : "https://ipfs.io/ipfs/"+cid
         }
 
-    # del_media()
+    del_media()
     print(data)
 
 
