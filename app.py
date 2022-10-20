@@ -1,7 +1,4 @@
-## Go to https://img2vdo.herokuapp.com/
-
 import os
-from turtle import width
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import requests
@@ -11,7 +8,7 @@ from PIL import Image
 
 path = (os.getcwd())
 path = os.path.join(path, 'static')
-#print(path)
+#print(path)   ##https://img2vdo.herokuapp.com/
 
 app = Flask(__name__)
 cors = CORS(app, resources={r"/i2v/*": {"origins": "*"}})
