@@ -139,7 +139,7 @@ def down(img_url, filename):
 # Video Generating function
 def generate_video(duration):
     image_folder = '.' # make sure to use your folder
-    video_name = 'video.mp4'
+    video_name = 'video.avi'
     os.chdir(path)
     
     images = [img for img in os.listdir(image_folder)
@@ -151,7 +151,7 @@ def generate_video(duration):
     num_of_images = len(images)
     print(num_of_images)
     Required_video_timeperiod = 20
-    fps = 20
+    fps = 15
 
     # Sorting images by name
     images.sort()
@@ -163,7 +163,7 @@ def generate_video(duration):
     # the width, height of first image
     height, width, layers = frame.shape
 
-    video = cv2.VideoWriter(video_name, cv2.VideoWriter_fourcc(*'mp4v'), fps, (width, height))
+    video = cv2.VideoWriter(video_name, 0, fps, (width, height))
 
     # Appending the images to the video one by one # cv2.VideoWriter_fourcc(*'MP4V')
     for image in images:
@@ -233,7 +233,7 @@ def api(images, duration, height, width):
     print("Image Processed")
     generate_video(duration)
     print("Video Generated")
-    # convert_avi_2_mp4("video.avi")
+    convert_avi_2_mp4("video.avi")
     cid= up("video.mp4")
     print("Video Uploaded")
     data = {
