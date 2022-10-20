@@ -1,4 +1,7 @@
+## Go to https://img2vdo.herokuapp.com/
+
 import os
+from turtle import width
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import requests
@@ -15,7 +18,7 @@ cors = CORS(app, resources={r"/i2v/*": {"origins": "*"}})
 
 @app.route('/')
 def hello():
-    return "Hello World"
+    return "Hello This Is Gaurav"
 
 
 def img():
@@ -70,31 +73,51 @@ def img():
     # Copying the image multiple time to
     # set video timestamp = 20 sec
     # Limitation max image = 10
-    Required_num_of_images = 20
-    if(Required_num_of_images > num_of_images):
-        copy_num =int((Required_num_of_images - num_of_images)/ num_of_images)
-        rem_num = Required_num_of_images % num_of_images 
-        if(copy_num):
-            for file in os.listdir('.'):
-                if file.endswith(".jpg") or file.endswith(".jpeg") or file.endswith("png"):
-                    # opening image using PIL Image
-                    im = Image.open(os.path.join(path, file))
 
-                    for x in range(copy_num):
-                        temp = file.split('.')
-                        temp[0]= temp[0]+'_'+ str(x)
-                        filename = temp[0]+'.'+temp[1]
-                        im.save(filename, 'JPEG', quality= 95)
-                        #print(filename)
-                        if (x == copy_num -1):
-                            if(rem_num):
-                                temp = file.split('.')
-                                temp[0]= temp[0]+'_'+ str(copy_num)
-                                filename = temp[0]+'.'+temp[1]
-                                im.save(filename, 'JPEG', quality= 95)
-                                #print(filename)
-                                rem_num = rem_num -1  
+    # Required_num_of_images = 20
+    # if(Required_num_of_images > num_of_images):
+    #     copy_num =int((Required_num_of_images - num_of_images)/ num_of_images)
+    #     rem_num = Required_num_of_images % num_of_images 
+    #     if(copy_num):
+    #         for file in os.listdir('.'):
+    #             if file.endswith(".jpg") or file.endswith(".jpeg") or file.endswith("png"):
+    #                 # opening image using PIL Image
+    #                 im = Image.open(os.path.join(path, file))
 
+    #                 for x in range(copy_num):
+    #                     temp = file.split('.')
+    #                     temp[0]= temp[0]+'_'+ str(x)
+    #                     filename = temp[0]+'.'+temp[1]
+    #                     im.save(filename, 'JPEG', quality= 95)
+    #                     #print(filename)
+    #                     if (x == copy_num -1):
+    #                         if(rem_num):
+    #                             temp = file.split('.')
+    #                             temp[0]= temp[0]+'_'+ str(copy_num)
+    #                             filename = temp[0]+'.'+temp[1]
+    #                             im.save(filename, 'JPEG', quality= 95)
+    #                             #print(filename)
+    #                             rem_num = rem_num -1  
+
+def set_resolution(height, width):
+    os.chdir(path)
+    print("Setting Resolution to height = %d and width %d", height, width)
+    # Resizing of the images to give
+    # them same width and height
+    for file in os.listdir('.'):
+        if file.endswith(".jpg") or file.endswith(".jpeg") or file.endswith("png"):
+            # opening image using PIL Image
+            im = Image.open(os.path.join(path, file))
+
+            # im.size includes the height and width of image
+            pwidth, pheight = im.size
+            #print(width, height)
+
+            # resizing
+            imResize = im.resize((width, height), Image.ANTIALIAS)
+            imResize.save( file, 'JPEG', quality = 95) # setting quality
+            # printing each resized image name
+            #print(im.filename.split('\\')[-1], " is resized")
 
 def down(img_url, filename):
     #image_url = "https://bafybeiefgd4fur5pjpbrcdlbncjvbyjvd7okph2mpz66bdkaj25zuz4xru.ipfs.w3s.link/3d_1515.jpg"
@@ -117,9 +140,9 @@ def down(img_url, filename):
 
 
 # Video Generating function
-def generate_video():
+def generate_video(duration):
     image_folder = '.' # make sure to use your folder
-    video_name = 'video.avi'
+    video_name = 'video.mp4'
     os.chdir(path)
     
     images = [img for img in os.listdir(image_folder)
@@ -131,7 +154,7 @@ def generate_video():
     num_of_images = len(images)
     print(num_of_images)
     Required_video_timeperiod = 20
-    fps = num_of_images/Required_video_timeperiod
+    fps = 20
 
     # Sorting images by name
     images.sort()
@@ -143,11 +166,12 @@ def generate_video():
     # the width, height of first image
     height, width, layers = frame.shape
 
-    video = cv2.VideoWriter(video_name, 0, 1, (width, height))
+    video = cv2.VideoWriter(video_name, cv2.VideoWriter_fourcc(*'mp4v'), fps, (width, height))
 
     # Appending the images to the video one by one # cv2.VideoWriter_fourcc(*'MP4V')
     for image in images:
-        video.write(cv2.imread(os.path.join(image_folder, image)))
+        for x in range(fps * duration):
+            video.write(cv2.imread(os.path.join(image_folder, image)))
     
     # Deallocating memories taken for window creation
     #cv2.destroyAllWindows()
@@ -198,18 +222,21 @@ def del_media():
             print(error)
             print("File % s can not be removed" % file_path)
 
-def api(images):
+def api(images, duration, height, width):
     try: 
         os.mkdir(path) 
     except OSError as error: 
         print(error) 
     #images = list(images)
     download_images(images)
-    img()
+    if(height and width):
+        set_resolution(height, width)
+    else:
+        img()
     print("Image Processed")
-    generate_video()
+    generate_video(duration)
     print("Video Generated")
-    convert_avi_2_mp4("video.avi")
+    # convert_avi_2_mp4("video.avi")
     cid= up("video.mp4")
     print("Video Uploaded")
     data = {
@@ -240,13 +267,18 @@ def aim():
         print(type(request_data))
         if (type(request_data) is dict):
             images_link = request_data['images']
+            duration = int(request_data["duration"])
+            width = int(request_data["width"])
+            height = int(request_data["height"])
+            data = api(images_link, duration, height, width)
         else:
             images_link = request_data
+            data = api(images_link)
         #images_link = request.form.get('images')
 
     else:
         images_link = request.args.get('images')
-    data = api(images_link)
+        data = api(images_link)
     return jsonify(data)
 
 
