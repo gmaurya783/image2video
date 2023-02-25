@@ -244,8 +244,7 @@ def api(images, duration, height, width):
 
     del_media()
     print(data)
-
-
+    
     return data
 
 
