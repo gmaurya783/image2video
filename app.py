@@ -62,8 +62,8 @@ def img():
             #print(width, height)
 
             # resizing
-            imResize = im.resize((mean_width, mean_height), Image.ANTIALIAS)
-            imResize.save( file, 'JPEG', quality = 95) # setting quality
+            imResize = im.resize((mean_width, mean_height), Image.Resampling.LANCZOS)
+            imResize.save( file, quality = 95) # setting quality
             # printing each resized image name
             #print(im.filename.split('\\')[-1], " is resized")
 
@@ -111,14 +111,14 @@ def set_resolution(height, width):
             #print(width, height)
 
             # resizing
-            imResize = im.resize((width, height), Image.ANTIALIAS)
-            imResize.save( file, 'JPEG', quality = 95) # setting quality
+            imResize = im.resize((width, height), Image.Resampling.LANCZOS)
+            imResize.save( file, quality = 95) # setting quality
             # printing each resized image name
             #print(im.filename.split('\\')[-1], " is resized")
 
 def down(img_url, filename):
     #image_url = "https://bafybeiefgd4fur5pjpbrcdlbncjvbyjvd7okph2mpz66bdkaj25zuz4xru.ipfs.w3s.link/3d_1515.jpg"
-    filename = filename + '.jpg'
+    filename = filename + '.png'
     save_path = os.path.join(path, filename)
   
     # URL of the image to be downloaded is defined as img_url
